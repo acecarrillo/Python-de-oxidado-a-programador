@@ -1,0 +1,35 @@
+# El manual de instrucciones para TODO tu ecosistema
+# version: '3.8'
+
+services:
+
+  # --- Servicio 1: Tu App de FLASK (Rol: Dev) ---
+  mi-app-web:
+    # Usa la imagen oficial de Python
+    image: python:3.11-slim 
+    # Carpeta de trabajo dentro de la caja
+    working_dir: /app
+    # Monta tu código local en la caja
+    volumes:
+      - .:/app
+    # Instala las dependencias
+    command: >
+      sh -c "pip install -r requirements.txt && 
+             python 22-app-flask.py"
+    # Mapea el puerto de Flask
+    ports:
+      - "5001:5001"
+
+  # --- Servicio 2: Tu DASHBOARD (Rol: Data) ---
+  mi-dashboard:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    # ¡Comando diferente!
+    command: >
+      sh -c "pip install -r requirements.txt && 
+             streamlit run 23-dashboard.py --server.port 8501 --server.address 0.0.0.0"
+    # Mapea el puerto de Streamlit
+    ports:
+      - "8501:8501"

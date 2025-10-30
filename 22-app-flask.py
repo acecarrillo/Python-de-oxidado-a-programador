@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     # "...ejecuta esta función."
-    return "¡Hola, mundo! Bienvenido a mi primera API."
+    return "¡Hola, mundo! Bienvenido a mi primera API. v2"
 
 # 3. Creamos una segunda ruta (para simular una API)
 #    Esta devolverá un JSON, como las APIs que ya conoces.
@@ -17,7 +17,7 @@ def api_saludo():
     # 'jsonify' es un helper de Flask que crea un JSON bien formateado
     data = {
         "mensaje": "Hola desde la API",
-        "usuario": "maestro_desoxidado"
+        "usuario": "el malamen"
     }
     return jsonify(data)
 
