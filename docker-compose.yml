@@ -1,35 +1,42 @@
-# El manual de instrucciones para TODO tu ecosistema
 # version: '3.8'
 
 services:
-
-  # --- Servicio 1: Tu App de FLASK (Rol: Dev) ---
+  
   mi-app-web:
-    # Usa la imagen oficial de Python
-    image: python:3.11-slim 
-    # Carpeta de trabajo dentro de la caja
+    image: python:3.11-slim
     working_dir: /app
-    # Monta tu código local en la caja
+    
+    # --- ¡CAMBIO IMPORTANTE! ---
+    # Ya no montamos el código fuente (¡esto es "producción"!)
+    # En su lugar, montamos nuestro "disco duro" llamado 'datos-db'
+    # en la carpeta '/data' que definimos en Flask.
     volumes:
-      - .:/app
-    # Instala las dependencias
+      - datos-db:/data  # 1. Nuestro "disco duro" para la base de datos
+      - .:/app           # 2. El "portal mágico" para el código
+      
     command: >
       sh -c "pip install -r requirements.txt && 
              python 22-app-flask.py"
-    # Mapea el puerto de Flask
     ports:
       - "5001:5001"
+      
+    # ¡NUEVO! Tenemos que "construir" la imagen
+    # cada vez, porque ya no leemos los archivos locales.
+    build: . 
 
-  # --- Servicio 2: Tu DASHBOARD (Rol: Data) ---
   mi-dashboard:
+    # (¡Este se queda igual, no necesita datos permanentes!)
     image: python:3.11-slim
     working_dir: /app
     volumes:
-      - .:/app
-    # ¡Comando diferente!
+      - .:/app # Lo dejamos en modo "desarrollo"
     command: >
       sh -c "pip install -r requirements.txt && 
              streamlit run 23-dashboard.py --server.port 8501 --server.address 0.0.0.0"
-    # Mapea el puerto de Streamlit
     ports:
-      - "8501:8501"
+      - "8501:8501" 
+      
+# --- ¡DEFINIMOS EL "DISCO DURO"! ---
+# Le decimos a Docker: "Oye, crea un volumen llamado 'datos-db'"
+volumes:
+  datos-db:
