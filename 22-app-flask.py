@@ -1,6 +1,8 @@
-from flask import Flask, jsonify
-import sqlite3 # ¡Módulo nativo de Python!
+from flask import Flask, jsonify, request
+import sqlite3
 import os
+import json
+import flask_utilities
 
 app = Flask(__name__)
 
@@ -51,6 +53,44 @@ def api_saludo():
         "usuario": "tester2"
     }
     return jsonify(data)
+
+@app.route("/saludo/<nombre>")
+def saludo_personalizado(nombre):
+    # Flask mágicamente toma el valor de la URL 
+    # y te lo pasa como argumento a la función.
+    return f"¡Hola, {nombre}! ¡Bienvenido a tu página personalizada!"
+
+
+@app.route("/api/v1/usuario/<username>")
+def api_usuario(username):
+    # ¡Funciona igual para APIs!
+    # (Simulamos una búsqueda de base de datos)
+    if username == "angelcarrillo":
+        datos = {"id": 1, "rol": "Coordinador", "status": "Activo"}
+    else:
+        datos = {"id": None, "rol": "Invitado", "status": "No encontrado"}
+        
+    return jsonify(datos)
+
+
+@app.route("/api/v1/items", methods=["GET", "POST"])
+def api_json_users():
+    JSON_PATH = "/data/tareas.json"
+    try: 
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        os.makedirs(os.path.dirname(JSON_PATH), exist_ok=True)
+        if request.method == "POST":
+            datos_recibidos = request.json
+            guardar_json = flask_utilities.cargar_tareas(datos_recibidos)
+            return jsonify({"mensaje": "Datos recibidos"})
+        if request.method == "GET":
+            obtener_json_local = flask_utilities.ver_tareas(JSON_PATH)
+            return jsonify(obtener_json_local)
+
+    except FileNotFoundError:
+        print("Archivo no encontrado")
+    except json.JSONDecodeError:
+        print("Error: El archivo JSON está corrupto o mal formateado.")
 
 # 4. El "if __name__" que ya conoces.
 #    Esto inicia el servidor.
